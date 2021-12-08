@@ -108,6 +108,7 @@ const BundleSchema = new Schema<IBundle>({
 		type: Boolean,
 		required: [true, 'Questions Template is required'],
 	},
+	
 	hiringTemplate: {
 		type: Boolean,
 		required: [true, 'Hiring Template is required'],
