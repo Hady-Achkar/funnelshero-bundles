@@ -5,7 +5,7 @@ import cors from 'cors'
 import multer from 'multer'
 import fileUpload from 'express-fileupload'
 import {connectDB,initSentry} from './lib'
-import {IndexRouter} from './routes'
+import {AuthorizedRouter} from './routes'
 import {Validateuser} from './middlewares'
 
 const main = async () => {
@@ -36,7 +36,7 @@ const main = async () => {
 		}
 	})
 	app.use(bodyParser.json())
-	app.use('/', Validateuser, IndexRouter)
+	app.use('/', Validateuser, AuthorizedRouter)
 	app.listen(process.env.MAIN_PORT, () => {
 		console.log(`[i] Server is listening on port ${process.env.MAIN_PORT}`)
 	})
