@@ -12,7 +12,7 @@ export const TestingTrialWillEnd = async (
 		let event
 		try {
 			// @ts-ignore
-			event = Stripe.webhooks.constructEvent(req.body, sig, endpointSecret)
+			event = Stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret)
 		} catch (err) {
 			// @ts-ignore
 			res.status(400).send(`Webhook Error: ${err.message}`)
