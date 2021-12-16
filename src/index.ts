@@ -7,6 +7,8 @@ import fileUpload from 'express-fileupload'
 import {connectDB, initSentry} from './lib'
 import {AuthorizedRouter, PublicRouter} from './routes'
 import {Validateuser} from './middlewares'
+import {TestingTrialWillEnd} from './controllers'
+import router from './routes/publicRouter'
 
 const main = async () => {
 	dotenv.config()
@@ -21,6 +23,7 @@ const main = async () => {
 		}),
 	)
 	app.use(multer().single(''))
+	app.post('/trial-end',express.raw({type: 'application/json'}),TestingTrialWillEnd)
 
 	app.use('/', async (req, _, next) => {
 		try {
