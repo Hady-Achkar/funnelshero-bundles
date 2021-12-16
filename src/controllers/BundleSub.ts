@@ -8,18 +8,14 @@ export const BundleSub = async (
 	try {
 		const {email, payment_method} = req.body
 
-		// const customer = await Stripe.customers.create({
-		// 	payment_method: payment_method,
-		// 	email: email,
-		// 	name:'Mostafa Halabi',
-		// 	invoice_settings: {
-		// 		default_payment_method: payment_method,
-		// 	},
-		// })
-		const customer = await Stripe.customers?.list({email})
-		console.log(customer.data[0].id)
+		const customer = await Stripe.customers.create({
+			// payment_method: payment_method,
+			email: email,
+			name:'Mostafa Halabi',
+		})
+		console.log(customer)
 		const subscription = await Stripe.subscriptions.create({
-			customer: 'cus_KmudVrSxM4zygK',
+			customer: customer.id,
 			items: [{price: 'price_1K77pcBfI0r8ox6OSZrUoMeS'}],
 			trial_from_plan: true,
 		})
