@@ -1,6 +1,12 @@
 import Stripe from 'stripe'
+import * as dotenv from 'dotenv'
 
-const stripe = new Stripe('sk_test_51K5v0rBfI0r8ox6OsiYU8bOv6Y8t96g7SbAjIa8KYZo9da0eHhmqhuA8nfCXRnuBQXQhYdB0OPPDINSsbzTVu7Wy00EBvByuPQ', {
+dotenv.config()
+const stripeKey = process.env.STRIPE_SECRET_KEY
+if (!stripeKey) {
+	process.exit(1)
+}
+const stripe = new Stripe(stripeKey, {
 	apiVersion: '2020-08-27',
 })
 
