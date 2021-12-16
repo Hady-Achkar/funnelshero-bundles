@@ -20,6 +20,7 @@ export const TestingTrialWillEnd = async (
 			return
 		}
 
+		console.log(event)
 		// Handle the event
 		switch (event.type) {
 			case 'payment_intent.succeeded':
@@ -32,6 +33,12 @@ export const TestingTrialWillEnd = async (
 		}
 
 		// Return a 200 response to acknowledge receipt of the event
+		return res.status(200).json({
+			status: 'Success',
+			message: 'Event was triggered successfully',
+			event,
+			requestTime: new Date().toISOString(),
+		})
 	} catch (err) {
 		if (err instanceof Error) {
 			return res.status(500).json({
