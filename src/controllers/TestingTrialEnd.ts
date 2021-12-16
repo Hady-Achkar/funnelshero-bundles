@@ -12,14 +12,15 @@ export const TestingTrialWillEnd = async (
 		let event
 		try {
 			// @ts-ignore
-			event = Stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret)
+			event = Stripe.webhooks.constructEvent(req.body, sig, endpointSecret)
+			console.log('asdnkajsndkjasnd')
 		} catch (err) {
 			// @ts-ignore
 			res.status(400).send(`Webhook Error: ${err.message}`)
 			return
 		}
 
-		console.log(event)
+		console.log('event',event)
 		// Handle the event
 		switch (event.type) {
 			case 'payment_intent.succeeded':

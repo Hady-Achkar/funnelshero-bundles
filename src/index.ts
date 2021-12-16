@@ -22,8 +22,21 @@ const main = async () => {
 			limits: {},
 		}),
 	)
+	app.use((req, res, next) => {
+		console.log(req.originalUrl)
+
+		if (req.originalUrl === '/public/trial-end') {
+			next();
+		} else {
+			bodyParser.json()(req, res, next);
+			app.use(
+				express.json({
+					limit: '50mb',
+				}),
+			)
+		}
+	});
 	app.use(multer().single(''))
-	app.post('/trial-end',express.raw({type: 'application/json'}),TestingTrialWillEnd)
 
 	app.use('/', async (req, _, next) => {
 		try {
@@ -36,12 +49,6 @@ const main = async () => {
 	})
 
 	app.use('/public', PublicRouter)
-	app.use(bodyParser.json())
-	app.use(
-		express.json({
-			limit: '50mb',
-		}),
-	)
 	app.use('/', Validateuser, AuthorizedRouter)
 	app.listen(process.env.MAIN_PORT, () => {
 		console.log(`[i] Server is listening on port ${process.env.MAIN_PORT}`)
