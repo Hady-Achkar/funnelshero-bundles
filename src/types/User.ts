@@ -1,13 +1,19 @@
 export enum UserType {
-  GOOGLE = 'GOOGLE',
-  FACEBOOK = 'FACEBOOK',
-  STANDARD = 'STANDARD',
+	GOOGLE = 'GOOGLE',
+	FACEBOOK = 'FACEBOOK',
+	STANDARD = 'STANDARD',
 }
-export interface IUser {
-  fullName?: string;
-  fname: string;
-  lname: string;
-  password: string;
-  email: string;
-  type: UserType;
+
+export enum ROLES {
+	SUPER_ADMIN = 'SUPER_ADMIN',
+	SUPPORT = 'SUPPORT'
+}
+
+export interface IUser extends Document {
+	fullName?: string;
+	fname: string;
+	lname: string;
+	password: string;
+	email: string;
+	type: UserType;
 }

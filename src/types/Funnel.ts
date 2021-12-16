@@ -1,5 +1,19 @@
 import {Document} from 'mongoose'
-import {IPage} from '.'
+import {IPage, IUser, ROLES} from '.'
+
+export interface ILink {
+	title: string
+	href: string
+}
+
+export interface IMenu extends Document {
+	title: string
+	links: ILink[]
+}
+
+export interface FunnelUser extends IUser, Document {
+	role: ROLES
+}
 
 export interface IFunnel extends Document {
 	title: string
@@ -12,9 +26,12 @@ export interface IFunnel extends Document {
 	favIcon: string
 	proDomain: string
 	pages: IPage[]
-	isActive:boolean
+	isActive: boolean
+	menus: IMenu[]
 	publish: {
 		pages: IPage[]
 	}
 	contactEmail: string
+	allowedNotifications: boolean
+	users: FunnelUser
 }
