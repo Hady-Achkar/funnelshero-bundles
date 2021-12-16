@@ -4,8 +4,8 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import multer from 'multer'
 import fileUpload from 'express-fileupload'
-import {connectDB,initSentry} from './lib'
-import {AuthorizedRouter} from './routes'
+import {connectDB, initSentry} from './lib'
+import {AuthorizedRouter, PublicRouter} from './routes'
 import {Validateuser} from './middlewares'
 
 const main = async () => {
@@ -36,6 +36,8 @@ const main = async () => {
 		}
 	})
 	app.use(bodyParser.json())
+	app.use('/public', PublicRouter)
+
 	app.use('/', Validateuser, AuthorizedRouter)
 	app.listen(process.env.MAIN_PORT, () => {
 		console.log(`[i] Server is listening on port ${process.env.MAIN_PORT}`)
