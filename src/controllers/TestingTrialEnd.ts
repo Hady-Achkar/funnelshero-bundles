@@ -10,7 +10,6 @@ export const TestingTrialWillEnd = async (
 		const sig = req.headers['stripe-signature']
 
 		let event
-
 		try {
 			// @ts-ignore
 			event = Stripe.webhooks.constructEvent(req.body, sig, endpointSecret)
