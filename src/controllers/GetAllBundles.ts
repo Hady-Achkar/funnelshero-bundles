@@ -1,16 +1,19 @@
 import {Request, Response} from 'express'
-import {Bundles} from '../models'
+import {Stripe} from '../lib'
 
 export const GetAllBundles = async (
 	req: Request,
 	res: Response,
 ) => {
 	try {
-		const allBundles = await Bundles.find()
+		const prices = await Stripe.prices.list({
+			expand: ['data.product'],
+			active: true,
+		})
 		return res.status(200).json({
 			status: 'Success',
-			message: 'Bundles were fetched successfully',
-			bundles: allBundles,
+			message: 'Prices fetched',
+			prices: prices.data,
 			requestTime: new Date().toISOString(),
 		})
 	} catch (err) {

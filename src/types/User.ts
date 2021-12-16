@@ -16,4 +16,9 @@ export interface IUser extends Document {
 	password: string;
 	email: string;
 	type: UserType;
+	activeSubscription: string
+	inTrial: boolean
+	isTrialLegit: boolean
 }
+
+
