@@ -35,9 +35,10 @@ const main = async () => {
 			console.log(error)
 		}
 	})
-	app.use(bodyParser.json())
-	app.use('/public', PublicRouter)
 
+	app.use('/public', PublicRouter)
+	app.use(bodyParser.json())
+	app.use(express.json())
 	app.use('/', Validateuser, AuthorizedRouter)
 	app.listen(process.env.MAIN_PORT, () => {
 		console.log(`[i] Server is listening on port ${process.env.MAIN_PORT}`)
