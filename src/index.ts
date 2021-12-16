@@ -23,6 +23,15 @@ const main = async () => {
 		}),
 	)
 	app.use(multer().single(''))
+	app.use(bodyParser.json({
+		verify: function (req, res, buf) {
+			//@ts-ignore
+			var url = req.originalUrl;
+			if (url.startsWith('/stripe'))
+				//@ts-ignore
+				req.rawBody = buf.toString();
+		}
+	}));
 	app.post('/trial-end',express.raw({type: 'application/json'}),TestingTrialWillEnd)
 
 	app.use('/', async (req, _, next) => {
