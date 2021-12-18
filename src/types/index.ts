@@ -8,6 +8,7 @@ export {OptSubmits} from './OptSubmits'
 export * from './Bundle'
 export {IAddNewBundle} from './IAddNewBundle'
 export {ITransaction, TransactionStatus} from './Transaction'
+export {IAddPaymentMethod} from './IAddPaymentMethod'
 
 export interface CustomRequest<T> extends Request {
 	body: T
