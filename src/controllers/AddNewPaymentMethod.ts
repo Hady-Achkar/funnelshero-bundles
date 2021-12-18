@@ -26,7 +26,7 @@ export const AddNewPaymentMethod = async (
 			paymentMethodId,
 			{customer: stripeId},
 		)
-		const updatedCustomer = await Stripe.customers?.update(stripeId, {
+		await Stripe.customers?.update(stripeId, {
 			invoice_settings: {
 				default_payment_method: paymentMethod?.id,
 			},
@@ -34,7 +34,7 @@ export const AddNewPaymentMethod = async (
 		res.status(200).json({
 			status: 'Success',
 			message: 'Payment method was added successfully',
-			user: updatedCustomer,
+			paymentMethod,
 			requestTime: new Date().toISOString(),
 		})
 	} catch (err) {
