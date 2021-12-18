@@ -1,4 +1,5 @@
 import {Request, Response} from 'express'
+import {Stripe} from '../lib'
 
 export const ConfigFront = async (
 	req: Request,
@@ -13,6 +14,7 @@ export const ConfigFront = async (
 			requestTime: new Date().toISOString(),
 		})
 	} catch (err) {
+
 		if (err instanceof Error) {
 			return res.status(500).json({
 				message: 'Internal Server Error',
