@@ -23,8 +23,6 @@ const main = async () => {
 		}),
 	)
 	app.use((req, res, next) => {
-		console.log(req.originalUrl)
-
 		if (req.originalUrl === '/public/trial-end') {
 			next();
 		} else {
