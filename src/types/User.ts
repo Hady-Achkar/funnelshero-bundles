@@ -1,3 +1,5 @@
+import {Document} from 'mongoose'
+
 export enum UserType {
 	GOOGLE = 'GOOGLE',
 	FACEBOOK = 'FACEBOOK',
@@ -19,6 +21,8 @@ export interface IUser extends Document {
 	activeSubscription: string
 	inTrial: boolean
 	isTrialLegit: boolean
+	stripeId: string
+	activePrice: string
 }
 
 
