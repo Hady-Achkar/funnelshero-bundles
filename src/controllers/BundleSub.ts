@@ -1,41 +1,55 @@
 import {Request, Response} from 'express'
 import {Stripe} from '../lib'
+import {Users} from '../models'
 
 export const BundleSub = async (
 	req: Request,
 	res: Response,
 ) => {
 	try {
-		const {email, payment_method} = req.body
-
-		const customer = await Stripe.customers.create({
-			// payment_method: payment_method,
-			email: email,
-			name:'Mostafa Halabi',
-		})
-		console.log(customer)
-		const subscription = await Stripe.subscriptions.create({
-			customer: customer.id,
-			items: [{price: 'price_1K77pcBfI0r8ox6OSZrUoMeS'}],
-			trial_from_plan: true,
-		})
-		if (!subscription) {
+		const {productPriceId} = req.body
+		//@ts-ignore
+		const {stripeId, _id: UserId} = req.user
+		if (!productPriceId || productPriceId === '') {
 			return res.status(400).json({
 				status: 'Failure',
-				message: 'subscription was not found',
+				errors: [
+					{
+						name: 'missing productPriceId',
+						field: 'productPriceId',
+					},
+				],
 				requestTime: new Date().toISOString(),
 			})
 		}
-		// // @ts-ignore
-		// const status = subscription['latest_invoice']['payment_intent']['status']
-		// @ts-ignore
-		// const client_secret = subscription['latest_invoice']['payment_intent']['client_secret']
-		// console.log(status)
+		const _verifyUser = await Users.findById(UserId)
+		if (!_verifyUser) {
+			return res.status(400).json({
+				status: 'Failure',
+				message: 'User was not found',
+				requestTime: new Date().toISOString(),
+			})
+		}
+		const {email: UserEmail} = _verifyUser
+		const _verifyPriceProductId = await Stripe.prices?.retrieve(productPriceId)
+		if (!_verifyPriceProductId.unit_amount) {
+			return res.status(400).json({
+				status: 'Failure',
+				message: 'Product was not found',
+				product: null,
+				requestTime: new Date().toISOString(),
+			})
+		}
+		const paymentIntent = await Stripe.paymentIntents.create({
+			amount: _verifyPriceProductId.unit_amount,
+			currency: 'usd',
+			receipt_email: UserEmail,
+		})
+		const clientSecret = paymentIntent['client_secret']
 		res.status(200).json({
 			status: 'Success',
-			message: 'Sub was created successfully',
-			// clientSecret: client_secret,
-			// subStatus: status,
+			message: 'Payment was prepared successfully',
+			clientSecret: clientSecret,
 			requestTime: new Date().toISOString(),
 		})
 	} catch (err) {
