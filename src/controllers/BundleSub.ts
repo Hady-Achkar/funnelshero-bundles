@@ -1,6 +1,7 @@
 import {Request, Response} from 'express'
 import {Stripe} from '../lib'
 import {Users} from '../models'
+import {log} from 'util'
 
 export const BundleSub = async (
 	req: Request,
@@ -33,10 +34,18 @@ export const BundleSub = async (
 		const {email: UserEmail} = _verifyUser
 		const _verifyPriceProductId = await Stripe.prices?.retrieve(productPriceId)
 		if (!_verifyPriceProductId.unit_amount) {
+			return res.status(500).json({
+				message: 'Internal Server Error',
+				error: 'Something went wrong',
+				requestTime: new Date().toISOString(),
+			})
+		}
+		const _verifyStripeUser = await Stripe.customers?.retrieve(stripeId)
+		if (!_verifyStripeUser) {
 			return res.status(400).json({
 				status: 'Failure',
-				message: 'Product was not found',
-				product: null,
+				message: 'Customer was not found in stripe',
+				customer: null,
 				requestTime: new Date().toISOString(),
 			})
 		}
@@ -44,12 +53,24 @@ export const BundleSub = async (
 			amount: _verifyPriceProductId.unit_amount,
 			currency: 'usd',
 			receipt_email: UserEmail,
+			customer: stripeId,
 		})
-		const clientSecret = paymentIntent['client_secret']
+		if (!paymentIntent) {
+			return res.status(500).json({
+				message: 'Internal Server Error',
+				error: 'Something went wrong',
+				requestTime: new Date().toISOString(),
+			})
+		}
+		const paymentIntentConfirm = await Stripe.paymentIntents.confirm(
+			paymentIntent.id,
+			//@ts-ignore
+			{payment_method: _verifyStripeUser.invoice_settings.default_payment_method},
+		)
+		console.log(paymentIntentConfirm)
 		res.status(200).json({
 			status: 'Success',
 			message: 'Payment was prepared successfully',
-			clientSecret: clientSecret,
 			requestTime: new Date().toISOString(),
 		})
 	} catch (err) {
