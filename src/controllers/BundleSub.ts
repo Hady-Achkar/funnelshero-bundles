@@ -1,14 +1,13 @@
 import {Request, Response} from 'express'
 import {Stripe} from '../lib'
 import {Users} from '../models'
-import {log} from 'util'
 
 export const BundleSub = async (
 	req: Request,
 	res: Response,
 ) => {
 	try {
-		const {productPriceId} = req.body
+		const {productPriceId, subscriptionId} = req.body
 		//@ts-ignore
 		const {stripeId, _id: UserId} = req.user
 		if (!productPriceId || productPriceId === '') {
@@ -18,6 +17,18 @@ export const BundleSub = async (
 					{
 						name: 'missing productPriceId',
 						field: 'productPriceId',
+					},
+				],
+				requestTime: new Date().toISOString(),
+			})
+		}
+		if (!subscriptionId || subscriptionId === '') {
+			return res.status(400).json({
+				status: 'Failure',
+				errors: [
+					{
+						name: 'missing subscriptionId',
+						field: 'subscriptionId',
 					},
 				],
 				requestTime: new Date().toISOString(),
@@ -37,6 +48,14 @@ export const BundleSub = async (
 			return res.status(500).json({
 				message: 'Internal Server Error',
 				error: 'Something went wrong',
+				requestTime: new Date().toISOString(),
+			})
+		}
+		const _verifySubscriptionId = await Stripe.subscriptions?.retrieve(subscriptionId)
+		if (!_verifySubscriptionId) {
+			return res.status(404).json({
+				status: 'Failure',
+				message: 'Subscription was not found',
 				requestTime: new Date().toISOString(),
 			})
 		}
@@ -67,12 +86,31 @@ export const BundleSub = async (
 			//@ts-ignore
 			{payment_method: _verifyStripeUser.invoice_settings.default_payment_method},
 		)
-		console.log(paymentIntentConfirm)
-		res.status(200).json({
-			status: 'Success',
-			message: 'Payment was prepared successfully',
-			requestTime: new Date().toISOString(),
-		})
+		if (paymentIntentConfirm && paymentIntentConfirm.status === 'succeeded') {
+			const updatedCustomer = await Users.findByIdAndUpdate(UserId, {
+				$set: {
+					activeSubscription: subscriptionId,
+					activePrice: subscriptionId,
+				},
+			}, {
+				new: true,
+			})
+			res.status(200).json({
+				status: 'Success',
+				message: 'Payment was done successfully',
+				paymentInvoice: paymentIntentConfirm,
+				user: updatedCustomer,
+				requestTime: new Date().toISOString(),
+			})
+		} else {
+			// Implement payment failed here
+			return res.status(500).json({
+				message: 'Internal Server Error',
+				error: 'Something went wrong',
+				requestTime: new Date().toISOString(),
+			})
+		}
+
 	} catch (err) {
 		if (err instanceof Error) {
 			return res.status(500).json({
