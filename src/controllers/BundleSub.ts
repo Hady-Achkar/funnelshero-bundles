@@ -1,13 +1,14 @@
 import {Request, Response} from 'express'
 import {Stripe} from '../lib'
 import {Users} from '../models'
+import {UserState} from '../types'
 
 export const BundleSub = async (
 	req: Request,
 	res: Response,
 ) => {
 	try {
-		const {productPriceId, subscriptionId} = req.body
+		const {productPriceId} = req.body
 		//@ts-ignore
 		const {stripeId, _id: UserId} = req.user
 		if (!productPriceId || productPriceId === '') {
@@ -17,18 +18,6 @@ export const BundleSub = async (
 					{
 						name: 'missing productPriceId',
 						field: 'productPriceId',
-					},
-				],
-				requestTime: new Date().toISOString(),
-			})
-		}
-		if (!subscriptionId || subscriptionId === '') {
-			return res.status(400).json({
-				status: 'Failure',
-				errors: [
-					{
-						name: 'missing subscriptionId',
-						field: 'subscriptionId',
 					},
 				],
 				requestTime: new Date().toISOString(),
@@ -48,14 +37,6 @@ export const BundleSub = async (
 			return res.status(500).json({
 				message: 'Internal Server Error',
 				error: 'Something went wrong',
-				requestTime: new Date().toISOString(),
-			})
-		}
-		const _verifySubscriptionId = await Stripe.subscriptions?.retrieve(subscriptionId)
-		if (!_verifySubscriptionId) {
-			return res.status(404).json({
-				status: 'Failure',
-				message: 'Subscription was not found',
 				requestTime: new Date().toISOString(),
 			})
 		}
@@ -89,8 +70,9 @@ export const BundleSub = async (
 		if (paymentIntentConfirm && paymentIntentConfirm.status === 'succeeded') {
 			const updatedCustomer = await Users.findByIdAndUpdate(UserId, {
 				$set: {
-					activeSubscription: subscriptionId,
-					activePrice: subscriptionId,
+					activeSubscription: _verifyUser.activeSubscription,
+					activePrice: _verifyUser.activeSubscription,
+					status: UserState.SUB_ACTIVE,
 				},
 			}, {
 				new: true,
