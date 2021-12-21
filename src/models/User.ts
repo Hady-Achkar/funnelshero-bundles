@@ -52,6 +52,10 @@ const UserSchema = new Schema<IUser>(
 			type: String,
 			default: '',
 		},
+		status:{
+			type:String,
+			default:''
+		}
 	},
 	{
 		timestamps: true,
