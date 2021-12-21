@@ -2,7 +2,7 @@ import {Request} from 'express'
 
 export {IFunnel, IMenu, FunnelUser} from './Funnel'
 export {IPage} from './Page'
-export {IUser, ROLES} from './User'
+export {IUser, ROLES, UserState} from './User'
 export {ITemplate} from './ITemplate'
 export {OptSubmits} from './OptSubmits'
 export * from './Bundle'

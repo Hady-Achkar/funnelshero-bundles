@@ -1,7 +1,7 @@
 import {Request, Response} from 'express'
 import {Stripe} from '../lib'
 import {Users} from '../models'
-import {log} from 'util'
+import {UserState} from '../types'
 
 export const BundleSub = async (
 	req: Request,
@@ -67,12 +67,32 @@ export const BundleSub = async (
 			//@ts-ignore
 			{payment_method: _verifyStripeUser.invoice_settings.default_payment_method},
 		)
-		console.log(paymentIntentConfirm)
-		res.status(200).json({
-			status: 'Success',
-			message: 'Payment was prepared successfully',
-			requestTime: new Date().toISOString(),
-		})
+		if (paymentIntentConfirm && paymentIntentConfirm.status === 'succeeded') {
+			const updatedCustomer = await Users.findByIdAndUpdate(UserId, {
+				$set: {
+					activeSubscription: _verifyUser.activeSubscription,
+					activePrice: _verifyUser.activeSubscription,
+					status: UserState.SUB_ACTIVE,
+				},
+			}, {
+				new: true,
+			})
+			res.status(200).json({
+				status: 'Success',
+				message: 'Payment was done successfully',
+				paymentInvoice: paymentIntentConfirm,
+				user: updatedCustomer,
+				requestTime: new Date().toISOString(),
+			})
+		} else {
+			// Implement payment failed here
+			return res.status(500).json({
+				message: 'Internal Server Error',
+				error: 'Something went wrong',
+				requestTime: new Date().toISOString(),
+			})
+		}
+
 	} catch (err) {
 		if (err instanceof Error) {
 			return res.status(500).json({

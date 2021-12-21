@@ -24,5 +24,9 @@ export interface IUser extends Document {
 	stripeId: string
 	activePrice: string
 }
-
-
+export enum UserState {
+	TRIAL = 'TRIAL',
+	TRIAL_END = 'TRIAL_END',
+	BLOCKED = 'BLOCKED',
+	SUB_ACTIVE = 'SUB_ACTIVE'
+}
