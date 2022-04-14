@@ -1,10 +1,7 @@
 import {Request, Response} from 'express'
 import {Stripe} from '../lib'
 
-export const GetAllBundles = async (
-	req: Request,
-	res: Response,
-) => {
+export const GetAllBundles = async (req: Request, res: Response) => {
 	try {
 		const prices = await Stripe.prices.list({
 			expand: ['data.product'],
@@ -19,10 +16,11 @@ export const GetAllBundles = async (
 	} catch (err) {
 		if (err instanceof Error) {
 			return res.status(500).json({
-				message: 'Internal Server Error',
+				message: 'Internalss Server Error',
 				error: err.message,
 				requestTime: new Date().toISOString(),
 			})
 		}
+		return res.send(err)
 	}
 }

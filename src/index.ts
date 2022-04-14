@@ -4,7 +4,7 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import multer from 'multer'
 import fileUpload from 'express-fileupload'
-import {connectDB, initSentry} from './lib'
+import {connectDB} from './lib'
 import {AuthorizedRouter, PublicRouter} from './routes'
 import {Validateuser} from './middlewares'
 import {TestingTrialWillEnd} from './controllers'
@@ -13,27 +13,26 @@ import router from './routes/publicRouter'
 const main = async () => {
 	dotenv.config()
 	connectDB()
-	initSentry()
 	const app = express()
 	app.use(cors())
 
 	app.use(
 		fileUpload({
 			limits: {},
-		}),
+		})
 	)
 	app.use((req, res, next) => {
 		if (req.originalUrl === '/public/trial-end') {
-			next();
+			next()
 		} else {
-			bodyParser.json()(req, res, next);
+			bodyParser.json()(req, res, next)
 			app.use(
 				express.json({
 					limit: '50mb',
-				}),
+				})
 			)
 		}
-	});
+	})
 	app.use(multer().single(''))
 
 	app.use('/', async (req, _, next) => {
