@@ -3,12 +3,9 @@ import {Stripe} from '../lib'
 import {Users} from '../models'
 import {UserState} from '../types'
 
-export const BundleSub = async (
-	req: Request,
-	res: Response,
-) => {
+export const BundleSub = async (req: Request, res: Response) => {
 	try {
-		const {productPriceId} = req.body
+		const {productPriceId, paymentMethod} = req.body
 		//@ts-ignore
 		const {stripeId, _id: UserId} = req.user
 		if (!productPriceId || productPriceId === '') {
@@ -64,19 +61,22 @@ export const BundleSub = async (
 		}
 		const paymentIntentConfirm = await Stripe.paymentIntents.confirm(
 			paymentIntent.id,
-			//@ts-ignore
-			{payment_method: _verifyStripeUser.invoice_settings.default_payment_method},
+			{payment_method: paymentMethod}
 		)
 		if (paymentIntentConfirm && paymentIntentConfirm.status === 'succeeded') {
-			const updatedCustomer = await Users.findByIdAndUpdate(UserId, {
-				$set: {
-					activeSubscription: _verifyUser.activeSubscription,
-					activePrice: _verifyUser.activeSubscription,
-					status: UserState.SUB_ACTIVE,
+			const updatedCustomer = await Users.findByIdAndUpdate(
+				UserId,
+				{
+					$set: {
+						activeSubscription: _verifyUser.activeSubscription,
+						activePrice: _verifyUser.activeSubscription,
+						status: UserState.SUB_ACTIVE,
+					},
 				},
-			}, {
-				new: true,
-			})
+				{
+					new: true,
+				}
+			)
 			res.status(200).json({
 				status: 'Success',
 				message: 'Payment was done successfully',
@@ -92,7 +92,6 @@ export const BundleSub = async (
 				requestTime: new Date().toISOString(),
 			})
 		}
-
 	} catch (err) {
 		if (err instanceof Error) {
 			return res.status(500).json({
