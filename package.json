@@ -7,7 +7,7 @@
     "test": "npm run test",
     "build": "tsc",
     "watch": "tsc --watch",
-    "dev": "nodemon ./dist/index.js",
+    "dev": "tsc && nodemon ./dist/index.js",
     "start": "node ./dist/index.js"
   },
   "keywords": [
