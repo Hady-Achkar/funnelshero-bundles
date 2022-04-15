@@ -2,7 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+<<<<<<< HEAD
       <module fileurl="file://$PROJECT_DIR$/.idea/funnels-backend.iml" filepath="$PROJECT_DIR$/.idea/funnels-backend.iml" />
+=======
+      <module fileurl="file://$PROJECT_DIR$/.idea/funnel-bundles.iml" filepath="$PROJECT_DIR$/.idea/funnel-bundles.iml" />
+>>>>>>> c02de56 (Init commit with new bundle route)
     </modules>
   </component>
 </project>
