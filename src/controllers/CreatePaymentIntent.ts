@@ -76,25 +76,26 @@ export default async (req: Request, res: Response) => {
 			res
 				.status(500)
 				.json({statusCode: 500, message: 'Error creating a subscription'})
-		}
-		const updatedUser = await Users.findByIdAndUpdate(
-			UserId,
-			{
-				$set: {
-					activeSubscription: subscription.id,
-					activePrice: priceId as string,
-					status: UserState.SUB_ACTIVE,
+		} else {
+			const updatedUser = await Users.findByIdAndUpdate(
+				UserId,
+				{
+					$set: {
+						activeSubscription: subscription.id,
+						activePrice: priceId as string,
+						status: UserState.SUB_ACTIVE,
+					},
 				},
-			},
-			{
-				new: true,
-			}
-		).select('-password')
-		res.status(200).json({
-			message: 'Subscription was created successfully',
-			subscription: subscription.id,
-			user: updatedUser,
-		})
+				{
+					new: true,
+				}
+			).select('-password')
+			res.status(200).json({
+				message: 'Subscription was created successfully',
+				subscription: subscription.id,
+				user: updatedUser,
+			})
+		}
 	} catch (err) {
 		if (err instanceof Error) {
 			res.status(500).json({statusCode: 500, message: err.message})
