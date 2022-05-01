@@ -46,11 +46,25 @@ export default async (req: Request, res: Response) => {
 				},
 			})
 		}
-		const subscription = await Stripe.subscriptions.create({
-			customer: stripeId,
-			items: [{price: priceId}],
-		})
 
+		const priceData = await Stripe.prices.retrieve(priceId)
+
+		// check if the price is recurring or not
+
+		let subscription
+		if (priceData.recurring !== null) {
+			subscription = await Stripe.subscriptions.create({
+				customer: stripeId,
+				items: [{price: priceId}],
+				expand: ['latest_invoice.payment_intent'],
+			})
+		} else {
+			subscription = await Stripe.paymentIntents.create({
+				customer: stripeId,
+				currency: 'usd',
+				amount: priceData.unit_amount,
+			})
+		}
 		const updatedUser = await Users.findByIdAndUpdate(
 			UserId,
 			{
