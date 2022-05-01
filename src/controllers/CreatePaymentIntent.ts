@@ -60,30 +60,16 @@ export default async (req: Request, res: Response) => {
 			})
 		} else {
 			if (priceData.unit_amount) {
-				const pi = await Stripe.paymentIntents.create({
+				const paymentIntent = await Stripe.paymentIntents.create({
 					customer: stripeId,
 					currency: 'usd',
 					amount: priceData.unit_amount,
 				})
 
-				const confirmed = await Stripe.paymentIntents.confirm({
-					id: pi.id,
-					paymentMethod: {paymentMethodId},
+				subscription = await Stripe.paymentIntents.confirm(paymentIntent.id, {
+					payment_method: paymentMethodId,
+					receipt_email: _verifyUser.email,
 				})
-
-				if (
-					confirmed.amount_received === 0 ||
-					confirmed.amount_received === null
-				) {
-					return res
-						.status(500)
-						.json({statusCode: 500, message: 'payment was not received'})
-				}
-				subscription = pi
-			} else {
-				return res
-					.status(500)
-					.json({statusCode: 500, message: 'unit amount is undefined'})
 			}
 		}
 		const updatedUser = await Users.findByIdAndUpdate(
