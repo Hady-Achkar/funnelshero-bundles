@@ -60,11 +60,26 @@ export default async (req: Request, res: Response) => {
 			})
 		} else {
 			if (priceData.unit_amount) {
-				subscription = await Stripe.paymentIntents.create({
+				const pi = await Stripe.paymentIntents.create({
 					customer: stripeId,
 					currency: 'usd',
 					amount: priceData.unit_amount,
 				})
+
+				const confirmed = await Stripe.paymentIntents.confirm({
+					id: pi.id,
+					paymentMethod: {paymentMethodId},
+				})
+
+				if (
+					confirmed.amount_received === 0 ||
+					confirmed.amount_received === null
+				) {
+					return res
+						.status(500)
+						.json({statusCode: 500, message: 'payment was not received'})
+				}
+				subscription = pi
 			} else {
 				return res
 					.status(500)
