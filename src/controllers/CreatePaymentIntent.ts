@@ -59,11 +59,17 @@ export default async (req: Request, res: Response) => {
 				expand: ['latest_invoice.payment_intent'],
 			})
 		} else {
-			subscription = await Stripe.paymentIntents.create({
-				customer: stripeId,
-				currency: 'usd',
-				amount: priceData.unit_amount,
-			})
+			if (priceData.unit_amount) {
+				subscription = await Stripe.paymentIntents.create({
+					customer: stripeId,
+					currency: 'usd',
+					amount: priceData.unit_amount,
+				})
+			} else {
+				return res
+					.status(500)
+					.json({statusCode: 500, message: 'unit amount is undefined'})
+			}
 		}
 		const updatedUser = await Users.findByIdAndUpdate(
 			UserId,
