@@ -72,6 +72,11 @@ export default async (req: Request, res: Response) => {
 				})
 			}
 		}
+		if (!subscription) {
+			res
+				.status(500)
+				.json({statusCode: 500, message: 'Error creating a subscription'})
+		}
 		const updatedUser = await Users.findByIdAndUpdate(
 			UserId,
 			{
