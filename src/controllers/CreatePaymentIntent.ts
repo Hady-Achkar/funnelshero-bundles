@@ -73,7 +73,7 @@ export default async (req: Request, res: Response) => {
 			}
 		}
 		if (!subscription) {
-			res
+			return res
 				.status(500)
 				.json({statusCode: 500, message: 'Error creating a subscription'})
 		} else {
